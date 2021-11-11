@@ -89,23 +89,33 @@ print( v_matrix[100][1])
 # determine which tickets are sold, what the remaining
 # capacity is and what the prices are at each moment
 
-S = 5 # n simulations
+S = 10 # n simulations
 c = 100 # initial capacity
-demand = []
 rewards = []
 tot_rewards = []
 
 for s in range(S):
     for t in range(T+1):
         if c != 0:
-            # simulate demand (TODO simulate with lambda)
-            random_index = random.randrange(len(f))
-            act_demand = f[random_index]
-            demand.append(act_demand)
-            # if demand is equal or higher to the policy, seat is purchased 
-            if act_demand >= p_matrix[c][t]:
-                c -= 1
-                rewards.append(act_demand)
+            # simulated demand:
+            # pol = policy[c][t] | lambda at [i][t] = P
+            # i = 0,1,2 (500, 300, 200)
+            # lambda(i>pol) --> P
+            # calcP = random value between 0 and 1
+            # calcP > 1 - P  ==> buy the tickt
+            lambda_sum = 0
+            policy = p_matrix[c][t]
+            if policy != 0:
+                index = f.index(policy)
+                for i in range(index+1):
+                    lambda_sum += fun_lambda(i, t)
+                act_probability = random.uniform(0,1)                
+                # if demand is equal or higher than the policy, seat is purchased 
+                if act_probability >= (1 - lambda_sum):
+                    c -= 1
+                    rewards.append(policy)
+                else:
+                    rewards.append(0)
             else:
                 rewards.append(0)
         else:
@@ -114,12 +124,17 @@ for s in range(S):
     rewards = []
     c = 100
 
+tot = 0
+mean = 0
+
 for i in range(len(tot_rewards)):
     sum_rew = 0
     rew_list = tot_rewards[i] 
     for e in range(len(rew_list)):
         sum_rew += rew_list[e]
-    print(sum_rew)
+    tot += sum_rew
+#     print(sum_rew)
+# mean = tot/len(tot_rewards)
 
 
 # task d)
@@ -130,24 +145,24 @@ for i in range(len(tot_rewards)):
 
 v_matrix = np.zeros((C+1, T+1))
 p_matrix = np.zeros((C+1, T+1))
-
-
-# TODO correct the policy restriction 
+ 
 for t in range(T-1,-1,-1):
     for x in range(C,0,-1):
         for a in range(len(f)):
-            if f[a] >= policy:
-                for i in range(a+1):
-                    lambda_sum += fun_lambda(i, t)                
+            for i in range(a+1):
+                lambda_sum += fun_lambda(i, t)                
+            if x<100 and t<601:
+                if f[a] >= p_matrix[x+1][t+1]: #TODO we're close but not there
+                    act_sum = lambda_sum* (f[a] + v_matrix[x-1][t+1]) + (1 - lambda_sum)* v_matrix[x][t+1]
+            else:
                 act_sum = lambda_sum* (f[a] + v_matrix[x-1][t+1]) + (1 - lambda_sum)* v_matrix[x][t+1]
-                if act_sum > max_sum:
-                    max_sum = act_sum
-                    policy = f[a]
-                lambda_sum = 0
+            if act_sum > max_sum:
+                max_sum = act_sum
+                policy = f[a]
+            lambda_sum = 0            
         v_matrix[x][t] = max_sum
         p_matrix[x][t] = policy
         max_sum = -math.inf
-        policy = -math.inf
 
 # Expected revenue
 print( v_matrix[100][1])
