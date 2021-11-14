@@ -71,16 +71,14 @@ for t in range(T-1,-1,-1):
         max_sum = -math.inf
 
 # Expected revenue
-print( v_matrix[100][1])
+print(v_matrix[100][1])
 
 # task b)
 # PLOTTING 
 # --------
 # b) Makes a plot of the policy (with time and capacity on the axes)
-# TODO uncomment when finishing c,d
-# im = plt.imshow(p_matrix, cmap="copper_r")
-# #plt.colorbar(im)
-# plt.show()
+im = plt.imshow(p_matrix, cmap="copper_r")
+plt.show()
 
 # task c)
 # SIMULATION
@@ -89,10 +87,11 @@ print( v_matrix[100][1])
 # determine which tickets are sold, what the remaining
 # capacity is and what the prices are at each moment
 
-S = 10 # n simulations
+S = 100 # n simulations
 c = 100 # initial capacity
 rewards = []
 tot_rewards = []
+remaining_capacity = []
 
 for s in range(S):
     for t in range(T+1):
@@ -122,19 +121,29 @@ for s in range(S):
             t = 600
     tot_rewards.append(rewards)
     rewards = []
+    remaining_capacity.append(c)
     c = 100
 
 tot = 0
 mean = 0
+tot_c = 0
+avg_c = 0
 
 for i in range(len(tot_rewards)):
     sum_rew = 0
     rew_list = tot_rewards[i] 
+    tot_c += remaining_capacity[i]
     for e in range(len(rew_list)):
         sum_rew += rew_list[e]
     tot += sum_rew
-#     print(sum_rew)
-# mean = tot/len(tot_rewards)
+mean = tot/len(tot_rewards)
+avg_c = tot_c/len(remaining_capacity)
+
+# Results
+print("Avg reward: ", end=" ")
+print(mean)
+print("Avg capacity: ", end=" ")
+print(avg_c)
 
 
 # task d)
@@ -152,7 +161,7 @@ for t in range(T-1,-1,-1):
             for i in range(a+1):
                 lambda_sum += fun_lambda(i, t)                
             if x<100 and t<601:
-                if f[a] >= p_matrix[x+1][t+1]: #TODO we're close but not there
+                if f[a] >= p_matrix[x+1][t+1]: 
                     act_sum = lambda_sum* (f[a] + v_matrix[x-1][t+1]) + (1 - lambda_sum)* v_matrix[x][t+1]
             else:
                 act_sum = lambda_sum* (f[a] + v_matrix[x-1][t+1]) + (1 - lambda_sum)* v_matrix[x][t+1]
@@ -166,3 +175,52 @@ for t in range(T-1,-1,-1):
 
 # Expected revenue
 print( v_matrix[100][1])
+
+tot_rewards = []
+remaining_capacity = []
+
+# Simulation algorithm from a)
+for s in range(S):
+    for t in range(T+1):
+        if c != 0:
+            lambda_sum = 0
+            policy = p_matrix[c][t]
+            if policy != 0:
+                index = f.index(policy)
+                for i in range(index+1):
+                    lambda_sum += fun_lambda(i, t)
+                act_probability = random.uniform(0,1)                
+                if act_probability >= (1 - lambda_sum):
+                    c -= 1
+                    rewards.append(policy)
+                else:
+                    rewards.append(0)
+            else:
+                rewards.append(0)
+        else:
+            t = 600
+    tot_rewards.append(rewards)
+    rewards = []
+    remaining_capacity.append(c)
+    c = 100
+
+tot = 0
+mean = 0
+tot_c = 0
+avg_c = 0
+
+for i in range(len(tot_rewards)):
+    sum_rew = 0
+    rew_list = tot_rewards[i] 
+    tot_c += remaining_capacity[i]
+    for e in range(len(rew_list)):
+        sum_rew += rew_list[e]
+    tot += sum_rew
+mean = tot/len(tot_rewards)
+avg_c = tot_c/len(remaining_capacity)
+
+# Results
+print("Avg reward: ", end=" ")
+print(mean)
+print("Avg capacity: ", end=" ")
+print(avg_c)
