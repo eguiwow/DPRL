@@ -85,28 +85,6 @@ for t in range(T):
 
 # print(v_star)
 
-#################### NOT MY CODE, TOCHANGE %%%%%%%%%%%%%%%%%%%%%%%%%%#
-# def Poisson (r,P):
-#     reward = np.append(r,0)
-#     poisson = np.zeros((92, 92))
-#     for i in range(91):
-#         for j in range(91):
-#             if P[i][j] !=0:
-#                 poisson[i][j] = - P[i][j] 
-#     for i in range(91):
-#         poisson[i][i] = poisson[i][i] +1
-#         poisson[i][91] = 1 
-#     poisson[91][0] = 1
-    
-#     # poisson = np.identity(91)-P
-#     # poisson = np.vstack([poisson, np.ones((91))])
-#     # poisson = np.c_[poisson, np.ones((92))]
-#     # poisson[91][91] = 0
-#     answer = np.linalg.solve(poisson, reward) #to solve the 91 equation simultaneously we make use of the numpy function .lingalg.solve
-#     return answer
-# print("Avg cost after solving poisson eqn :",round(Poisson(r,probability_matrix)[-1],4),"\n")
-
-
 V = np.zeros(91)
 
 for i in range(100):
@@ -119,16 +97,6 @@ phi = r +  probability_matrix.dot(V) - V
 # print(phi)
 
 
-
-
-
-
-
-
-
-
-################ NOT MY CODE, TOCHANGE %%%%%%%%%%%%%%%%%%%%%%%%%%#
-
 # task c)
 # PREVENTIVE REPLACEMENT AT COST 0.5
 # --------------
@@ -136,6 +104,8 @@ phi = r +  probability_matrix.dot(V) - V
 # using:
 # - policy iteration
 # - value iteration
+
+
 
 V = np.zeros(91)
 
